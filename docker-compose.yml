@@ -1,0 +1,23 @@
+services:
+  web:
+    build: 
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: sail_note_development
+    #データの保存場所
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+#Dockerが管理する保存場所を定義
+volumes:
+  postgres_data:
