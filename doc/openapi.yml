@@ -1,0 +1,990 @@
+openapi: 3.0.4
+info:
+  title: Sail note API
+  version: 1.0.0
+  description: セーリング練習記録アプリ
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: "https://virtserver.swaggerhub.com/nocompany-275/test/1.0.0"
+  - url: "http://localhost:3000"
+paths:
+  /api/v1/auth/login:
+    post:
+      summary: ログイン
+      description: メールアドレスとパスワードでログインしJWTを取得する
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: sample@example.com
+                password:
+                  type: string
+                  example: password123
+              required:
+                - email
+                - password
+      responses:
+        "200":
+          description: ログイン成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    $ref: "#/components/schemas/User"
+        "401":
+          description: 認証失敗
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+      operationId: ""
+  /api/v1/auth/register:
+    post:
+      summary: 新規ユーザー登録
+      description: 新規ユーザー登録しJWTを取得する
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: 登録成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    $ref: "#/components/schemas/User"
+        "422":
+          description: バリデーションエラー
+  /api/v1/auth/me:
+    get:
+      summary: ユーザー情報取得
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+  "/api/v1/users/{id}":
+    get:
+      summary: ユーザー情報取得
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ユーザーID
+          required: true
+          schema:
+            type: integer
+          example: 3
+      responses:
+        "200":
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+    patch:
+      summary: ユーザー情報更新
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ユーザーID
+          required: true
+          schema:
+            type: integer
+          example: 3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                boat_class:
+                  type: string
+      responses:
+        "200":
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+  /api/v1/practice_records:
+    post:
+      summary: 練習記録追加
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PracticeRecordCreateRequest"
+      responses:
+        "201":
+          description: 練習記録作成成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  practice_record:
+                    $ref: "#/components/schemas/PracticeRecord"
+        "401":
+          description: 認証エラー
+        "404":
+          description: 存在しません
+    get:
+      summary: 練習記録一覧取得
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: wind_direction
+          in: query
+          description: 風向で絞り込み
+          required: false
+          schema:
+            type: string
+          example: 北風
+        - name: wind_speed_min
+          in: query
+          description: 最低風速で絞り込み
+          required: false
+          schema:
+            type: integer
+          example: 2
+        - name: wind_speed_max
+          in: query
+          description: 最高風速で絞り込み
+          required: false
+          schema:
+            type: integer
+          example: 5
+        - name: practice_date
+          in: query
+          description: 練習日で絞り込み
+          required: false
+          schema:
+            type: string
+            format: date
+          example: "2026-03-01"
+        - name: user_id
+          in: query
+          description: ユーザーIDで絞り込み
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PracticeRecord"
+  "/api/v1/practice_records/{id}":
+    get:
+      summary: 練習記録詳細取得
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: 練習記録ID
+          required: true
+          schema:
+            type: integer
+          example: 3
+      responses:
+        "200":
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  practice_record:
+                    $ref: "#/components/schemas/PracticeRecord"
+        "401":
+          description: 認証エラー
+        "404":
+          description: 存在しない
+    patch:
+      summary: 練習記録更新
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: 練習記録ID
+          required: true
+          schema:
+            type: integer
+          example: 3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PracticeRecordCreateRequest"
+      responses:
+        "200":
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  practice_record:
+                    $ref: "#/components/schemas/PracticeRecord"
+        "401":
+          description: 必須パラメータが不足しています
+    delete:
+      summary: 練習記録削除
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: 練習記録ID
+          required: true
+          schema:
+            type: integer
+          example: 3
+      responses:
+        "200":
+          description: 削除成功
+  "/api/v1/practice_records/{practice_record_id}/comments":
+    post:
+      summary: コメント追加
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: practice_record_id
+          in: path
+          description: 練習記録ID
+          required: true
+          schema:
+            type: integer
+          example: 3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommentCreateRequest"
+      responses:
+        "201":
+          description: コメント作成成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  comment:
+                    $ref: "#/components/schemas/Comment"
+        "401":
+          description: 認証エラー
+        "404":
+          description: 存在しません
+    get:
+      summary: コメント一覧取得
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: practice_record_id
+          in: path
+          description: 練習記録ID
+          required: true
+          schema:
+            type: integer
+          example: 3
+      responses:
+        "200":
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Comment"
+  "/api/v1/comments/{id}":
+    delete:
+      summary: コメント削除
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: コメントID
+          required: true
+          schema:
+            type: integer
+          example: 3
+      responses:
+        "200":
+          description: 削除成功
+
+  /api/v1/tournaments:
+    post:
+      summary: 大会追加
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TournamentCreateRequest"
+      responses:
+        "200":
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tournament:
+                    $ref: "#/components/schemas/Tournament"
+        "401":
+          description: 必須パラメータが不足しています
+    get:
+      summary: 大会一覧取得
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Tournament"
+  "/api/v1/tournaments/{id}":
+    patch:
+      summary: 大会更新
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: 大会ID
+          required: true
+          schema:
+            type: integer
+          example: 3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Tournament"
+      responses:
+        "200":
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tournament:
+                    $ref: "#/components/schemas/Tournament"
+        "401":
+          description: 必須パラメータが不足しています
+    delete:
+      summary: 大会削除
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: 大会ID
+          required: true
+          schema:
+            type: integer
+          example: 3
+      responses:
+        "200":
+          description: 削除成功
+
+  "/api/v1/tournaments/{tournament_id}/entries":
+    post:
+      summary: 大会詳細記録追加
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tournament_id
+          in: path
+          description: ユーザーID
+          required: true
+          schema:
+            type: integer
+          example: 3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TournamentCreateRequest"
+      responses:
+        "200":
+          description: 大会作成成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tournament:
+                    $ref: "#/components/schemas/Tournament"
+        "401":
+          description: 認証エラー
+        "404":
+          description: 存在しません
+    get:
+      summary: 大会一覧取得
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tournament_id
+          in: path
+          description: 大会ID
+          required: true
+          schema:
+            type: integer
+          example: 3
+      responses:
+        "200":
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Tournament"
+  "/api/v1/tournament_entries/{id}":
+    patch:
+      summary: 大会記録更新
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: 大会ID
+          required: true
+          schema:
+            type: integer
+          example: 3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TournamentCreateRequest"
+      responses:
+        "200":
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tournament:
+                    $ref: "#/components/schemas/Tournament"
+        "401":
+          description: 必須パラメータが不足しています
+    delete:
+      summary: 大会記録削除
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: 大会記録ID
+          required: true
+          schema:
+            type: integer
+          example: 3
+      responses:
+        "200":
+          description: 削除成功
+  "/api/v1/tournament_entries/{tournament_entry_id}/race_results":
+    post:
+      summary: レース結果追加
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tournament_entry_id
+          in: path
+          description: 大会ID
+          required: true
+          schema:
+            type: integer
+          example: 3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RaceResultCreateRequest"
+      responses:
+        "200":
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  race_result:
+                    $ref: "#/components/schemas/RaceResult"
+        "401":
+          description: 必須パラメータが不足しています
+    get:
+      summary: レース結果一覧取得
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tournament_entry_id
+          in: path
+          description: 大会ID
+          required: true
+          schema:
+            type: integer
+          example: 3
+      responses:
+        "200":
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RaceResult"
+  "/api/v1/race_results/{id}":
+    patch:
+      summary: レース結果更新
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: レースID
+          required: true
+          schema:
+            type: integer
+          example: 3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RaceResultCreateRequest"
+      responses:
+        "200":
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  race_result:
+                    $ref: "#/components/schemas/RaceResult"
+        "401":
+          description: 必須パラメータが不足しています
+    delete:
+      summary: レース記録削除
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: レース記録ID
+          required: true
+          schema:
+            type: integer
+          example: 3
+      responses:
+        "200":
+          description: 削除成功
+  /api/v1/monthly_goals:
+    post:
+      summary: 月目標追加
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MonthlyGoalCreateRequest"
+      responses:
+        "200":
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  monthly_goal:
+                    $ref: "#/components/schemas/MonthlyGoal"
+        "401":
+          description: 必須パラメータが不足しています
+    get:
+      summary: 月記録一覧取得
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MonthlyGoal"
+  "/api/v1/monthly_goals/{id}":
+    patch:
+      summary: 月目標更新
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: 月目標ID
+          required: true
+          schema:
+            type: integer
+          example: 3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MonthlyGoalCreateRequest"
+      responses:
+        "200":
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  monthly_goal:
+                    $ref: "#/components/schemas/MonthlyGoal"
+        "401":
+          description: 必須パラメータが不足しています
+    delete:
+      summary: 月目標削除
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: 月目標ID
+          required: true
+          schema:
+            type: integer
+          example: 3
+      responses:
+        "200":
+          description: 削除成功
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 2
+        username:
+          type: string
+          example: 田中
+        email:
+          type: string
+          format: email
+          example: example@sample.com
+      required:
+        - id
+        - username
+        - email
+    RegisterRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          example: 田中
+        email:
+          type: string
+          format: email
+          example: example@sample.com
+        password:
+          type: string
+          example: password1234
+        boat_class:
+          type: string
+          example: snipe
+      required:
+        - username
+        - email
+        - password
+        - boat_class
+    PracticeRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 3
+        user:
+          $ref: "#/components/schemas/User"
+        practice_date:
+          type: string
+          format: date
+          description: 練習日
+          example: "2026-03-01"
+        wind_direction:
+          type: string
+          example: 北風
+        wind_speed_min:
+          type: integer
+          example: 2
+        wind_speed_max:
+          type: integer
+          example: 5
+        tide:
+          type: string
+          example: 中潮
+        mast_rake:
+          type: integer
+          example: 6550
+        mast_bend:
+          type: integer
+          example: 30
+        mast_spreader_angle:
+          type: integer
+          example: 720
+        mast_spreader_length:
+          type: integer
+          example: 420
+        mast_tension:
+          type: integer
+          example: 20
+        content:
+          type: string
+          example: スタート練習
+        reflection:
+          type: string
+          example: フルスピードでスタートできなかった
+        weather_api:
+          type: string
+          example: 曇り
+        temperature_api:
+          type: number
+          format: float
+          example: 20.2
+        image_url:
+          type: string
+          format: uri
+          example: "https://example.com/images/practice1.jpg"
+      required:
+        - id
+        - user
+        - practice_date
+    PracticeRecordCreateRequest:
+      type: object
+      properties:
+        practice_date:
+          type: string
+          format: date
+          description: 練習日
+          example: "2026-03-01"
+        wind_direction:
+          type: string
+          example: 北風
+        wind_speed_min:
+          type: integer
+          example: 2
+        wind_speed_max:
+          type: integer
+          example: 5
+        tide:
+          type: string
+          example: 中潮
+        mast_rake:
+          type: integer
+          example: 6550
+        mast_bend:
+          type: integer
+          example: 30
+        mast_spreader_angle:
+          type: integer
+          example: 720
+        mast_spreader_length:
+          type: integer
+          example: 420
+        mast_tension:
+          type: integer
+          example: 20
+        content:
+          type: string
+          example: スタート練習
+        reflection:
+          type: string
+          example: フルスピードでスタートできなかった
+        weather_api:
+          type: string
+          example: 曇り
+        temperature_api:
+          type: number
+          format: float
+          example: 20.2
+        image_url:
+          type: string
+          format: uri
+          example: "https://example.com/images/practice1.jpg"
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 3
+        user:
+          $ref: "#/components/schemas/User"
+        content:
+          type: string
+          example: コメントの内容
+      required:
+        - id
+        - user
+        - content
+    CommentCreateRequest:
+      type: object
+      properties:
+        content:
+          type: string
+          example: コメント
+    Tournament:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 3
+        name:
+          type: string
+          example: 全日本インカレ
+        held_date:
+          type: string
+          format: date
+          example: "2025-10-02"
+        boats_count:
+          type: integer
+          example: 72
+        race_count:
+          type: integer
+          example: 7
+    TournamentCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 全日本インカレ
+        held_date:
+          type: string
+          format: date
+          example: "2025-10-02"
+        boats_count:
+          type: integer
+          example: 72
+        race_count:
+          type: integer
+          example: 7
+    RaceResult:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 3
+    RaceResultCreateRequest:
+      type: object
+      properties:
+        score:
+          type: integer
+          example: 3
+    MonthlyGoal:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 3
+        user:
+          $ref: "#/components/schemas/User"
+        goal_date:
+          type: string
+          example: "2026-06-01"
+        content:
+          type: string
+          example: 目標の内容
+        achievement_rate:
+          type: integer
+          example: 90
+      required:
+        - goal_date
+        - content
+    MonthlyGoalCreateRequest:
+      type: object
+      properties:
+        goal_date:
+          type: string
+          example: "2026-06-01"
+        content:
+          type: string
+          example: 目標の内容
+        achievement_rate:
+          type: integer
+          example: 90
