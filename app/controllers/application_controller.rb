@@ -12,7 +12,7 @@ class ApplicationController < ActionController::API
     end
 
     def authenticate_user!
-        render json: { error: '認証が必要です' }, status: unauthorized unless logged_in?
+        render json: { error: '認証が必要です' }, status: :unauthorized unless logged_in?
     end
 
     private

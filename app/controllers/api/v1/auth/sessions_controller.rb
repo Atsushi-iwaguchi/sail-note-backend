@@ -1,4 +1,4 @@
-class Api::V1::SessionsController < ApplicationController
+class Api::V1::Auth::SessionsController < ApplicationController
   #ログイン用, 登録済みユーザーを確認してJWTを発行する
   def create
     user = User.find_by(email: params[:email])
