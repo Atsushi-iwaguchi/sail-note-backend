@@ -6,8 +6,9 @@ info:
 servers:
   # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
-    url: "https://virtserver.swaggerhub.com/nocompany-275/test/1.0.0"
-  - url: "http://localhost:3000"
+    url: https://virtserver.swaggerhub.com/nocompany-275/test/1.0.0
+  - url: http://localhost:3000
+    description: Local Development'
 paths:
   /api/v1/auth/login:
     post:
