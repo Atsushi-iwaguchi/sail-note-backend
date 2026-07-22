@@ -1,9 +1,9 @@
 class Api::V1::Auth::SessionsController < ApplicationController
-  #ログイン用, 登録済みユーザーを確認してJWTを発行する
+  # ログイン用, 登録済みユーザーを確認してJWTを発行する
   def create
     user = User.find_by(email: params[:email])
 
-    #user.authenticate("パスワード")→パスワードが正しければuserオブジェクト, 違えばfalseを返す
+    # user.authenticate("パスワード")→パスワードが正しければuserオブジェクト, 違えばfalseを返す
     if user && user.authenticate(params[:password])
       token = generate_token(user)
       render json: {
@@ -18,6 +18,6 @@ class Api::V1::Auth::SessionsController < ApplicationController
   private
   def generate_token(user)
     payload = user.to_token_payload
-    JWT.encode(payload, Rails.application.secret_key_base, 'HS256')
+    JWT.encode(payload, Rails.application.secret_key_base, "HS256")
   end
 end

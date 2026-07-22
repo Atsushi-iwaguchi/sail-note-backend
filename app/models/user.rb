@@ -5,13 +5,13 @@ class User < ApplicationRecord
 
     enum :role, { member: 0, leader: 1 }
 
-    #JWTトークン用にユーザー情報をペイロードに変換
+    # JWTトークン用にユーザー情報をペイロードに変換
     def to_token_payload
         {
             sub: id,
             email: email,
             role: role,
-            exp: 24.hours.from_now.to_i #有効期限
+            exp: 24.hours.from_now.to_i # 有効期限
         }
     end
 end

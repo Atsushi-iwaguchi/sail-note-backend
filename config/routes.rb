@@ -2,11 +2,11 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       namespace :auth do
-        post 'register', to: 'users#create'
-        post 'login', to: 'sessions#create'
+        post "register", to: "users#create"
+        post "login", to: "sessions#create"
       end
 
-      get 'me', to: 'users#me'
+      get "me", to: "users#me"
     end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
