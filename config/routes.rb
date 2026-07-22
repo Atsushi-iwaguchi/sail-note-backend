@@ -8,7 +8,10 @@ Rails.application.routes.draw do
 
       get "me", to: "users#me"
 
-      resources :practice_records, only: [:index, :create, :show, :update, :destroy]
+      resources :practice_records, only: [:index, :create, :show, :update, :destroy] do
+        resources :comments, only: [:index, :create]
+      end
+      resources :comments, only: [:destroy]
     end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
