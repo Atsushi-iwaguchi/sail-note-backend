@@ -15,7 +15,7 @@ class Api::V1::Auth::UsersController < ApplicationController
 
   private
   def user_params
-    params.require(:user).permit(:email, :password, :password_confirmation, :username, :boat_class, :role)
+    params.require(:user).permit(:email, :password, :password_confirmation, :username, :boat_class)
   end
 
   # user.to_token_payloadでペイロードを取得してJWT.encodeで秘密鍵を使って署名エンコードしてトークン文字列を生成
