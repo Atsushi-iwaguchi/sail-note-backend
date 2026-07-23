@@ -6,6 +6,7 @@ class User < ApplicationRecord
     has_many :practice_records, dependent: :destroy
     has_many :comments, dependent: :destroy
     has_many :tournament_entries, dependent: :destroy
+    has_many :race_results, through: :tournament_entries
 
     enum :role, { member: 0, leader: 1 }
 

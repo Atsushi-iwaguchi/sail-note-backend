@@ -15,7 +15,11 @@ Rails.application.routes.draw do
       resources :tournaments, only: [:index, :create, :show, :update, :destroy] do
         resources :tournament_entries, only: [:index, :create]
       end
-      resources :tournament_entries, only: [:update, :destroy]
+      resources :tournament_entries, only: [:update, :destroy] do 
+        resources :race_results, only: [:index, :create]
+      end
+
+      resources :race_results, only: [:update, :destroy]
     end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_23_105659) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_23_122742) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -43,6 +43,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_23_105659) do
     t.string "weather"
     t.string "wind_direction"
     t.index ["user_id"], name: "index_practice_records_on_user_id"
+  end
+
+  create_table "race_results", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "race_number", null: false
+    t.integer "score", null: false
+    t.bigint "tournament_entry_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["tournament_entry_id"], name: "index_race_results_on_tournament_entry_id"
   end
 
   create_table "tournament_entries", force: :cascade do |t|
@@ -79,6 +88,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_23_105659) do
   add_foreign_key "comments", "practice_records"
   add_foreign_key "comments", "users"
   add_foreign_key "practice_records", "users"
+  add_foreign_key "race_results", "tournament_entries"
   add_foreign_key "tournament_entries", "tournaments"
   add_foreign_key "tournament_entries", "users"
 end
