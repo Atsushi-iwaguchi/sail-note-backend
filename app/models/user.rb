@@ -4,6 +4,7 @@ class User < ApplicationRecord
     validates :password, length: { minimum: 6 }, if: -> { new_record? || !password.nil? }
 
     has_many :practice_records, dependent: :destroy
+    has_many :comments, dependent: :destroy
 
     enum :role, { member: 0, leader: 1 }
 

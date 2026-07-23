@@ -12,6 +12,7 @@ Rails.application.routes.draw do
         resources :comments, only: [:index, :create]
       end
       resources :comments, only: [:destroy]
+      resources :tournaments, only: [:index, :create, :show, :update, :destroy]
     end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
