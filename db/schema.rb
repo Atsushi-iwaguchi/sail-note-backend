@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_23_122742) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_24_010503) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -22,6 +22,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_23_122742) do
     t.bigint "user_id", null: false
     t.index ["practice_record_id"], name: "index_comments_on_practice_record_id"
     t.index ["user_id"], name: "index_comments_on_user_id"
+  end
+
+  create_table "monthly_goals", force: :cascade do |t|
+    t.integer "achievement_rate"
+    t.text "content", null: false
+    t.datetime "created_at", null: false
+    t.date "goal_date", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_monthly_goals_on_user_id"
   end
 
   create_table "practice_records", force: :cascade do |t|
@@ -87,6 +97,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_23_122742) do
 
   add_foreign_key "comments", "practice_records"
   add_foreign_key "comments", "users"
+  add_foreign_key "monthly_goals", "users"
   add_foreign_key "practice_records", "users"
   add_foreign_key "race_results", "tournament_entries"
   add_foreign_key "tournament_entries", "tournaments"

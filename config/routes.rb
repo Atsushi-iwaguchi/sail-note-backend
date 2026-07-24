@@ -20,6 +20,7 @@ Rails.application.routes.draw do
       end
 
       resources :race_results, only: [:update, :destroy]
+      resources :monthly_goals, only: [:index, :create, :update, :destroy]
     end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

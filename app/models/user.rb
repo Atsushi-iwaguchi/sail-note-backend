@@ -7,6 +7,7 @@ class User < ApplicationRecord
     has_many :comments, dependent: :destroy
     has_many :tournament_entries, dependent: :destroy
     has_many :race_results, through: :tournament_entries
+    has_many :monthly_goals, dependent: :destroy
 
     enum :role, { member: 0, leader: 1 }
 
