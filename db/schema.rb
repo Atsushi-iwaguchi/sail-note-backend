@@ -10,9 +10,80 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_22_024934) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_24_010503) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "comments", force: :cascade do |t|
+    t.text "content", null: false
+    t.datetime "created_at", null: false
+    t.bigint "practice_record_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["practice_record_id"], name: "index_comments_on_practice_record_id"
+    t.index ["user_id"], name: "index_comments_on_user_id"
+  end
+
+  create_table "monthly_goals", force: :cascade do |t|
+    t.integer "achievement_rate"
+    t.text "content", null: false
+    t.datetime "created_at", null: false
+    t.date "goal_date", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_monthly_goals_on_user_id"
+  end
+
+  create_table "practice_records", force: :cascade do |t|
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.integer "mast_bend"
+    t.integer "mast_rake"
+    t.integer "mast_spreader_angle"
+    t.integer "mast_spreader_length"
+    t.integer "mast_tension"
+    t.integer "max_wind_speed"
+    t.integer "min_wind_speed"
+    t.date "practice_date", null: false
+    t.text "reflection"
+    t.float "temperature"
+    t.integer "tide"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.string "weather"
+    t.string "wind_direction"
+    t.index ["user_id"], name: "index_practice_records_on_user_id"
+  end
+
+  create_table "race_results", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "race_number", null: false
+    t.integer "score", null: false
+    t.bigint "tournament_entry_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["tournament_entry_id"], name: "index_race_results_on_tournament_entry_id"
+  end
+
+  create_table "tournament_entries", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "overall_ranking", null: false
+    t.text "reflection"
+    t.bigint "tournament_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["tournament_id"], name: "index_tournament_entries_on_tournament_id"
+    t.index ["user_id"], name: "index_tournament_entries_on_user_id"
+  end
+
+  create_table "tournaments", force: :cascade do |t|
+    t.integer "boats_count"
+    t.datetime "created_at", null: false
+    t.date "end_date", null: false
+    t.string "name", null: false
+    t.integer "race_count"
+    t.date "start_date", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "users", force: :cascade do |t|
     t.string "boat_class"
@@ -23,4 +94,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_22_024934) do
     t.datetime "updated_at", null: false
     t.string "username", null: false
   end
+
+  add_foreign_key "comments", "practice_records"
+  add_foreign_key "comments", "users"
+  add_foreign_key "monthly_goals", "users"
+  add_foreign_key "practice_records", "users"
+  add_foreign_key "race_results", "tournament_entries"
+  add_foreign_key "tournament_entries", "tournaments"
+  add_foreign_key "tournament_entries", "users"
 end

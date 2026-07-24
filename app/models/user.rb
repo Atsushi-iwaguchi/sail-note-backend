@@ -3,6 +3,12 @@ class User < ApplicationRecord
     validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
     validates :password, length: { minimum: 6 }, if: -> { new_record? || !password.nil? }
 
+    has_many :practice_records, dependent: :destroy
+    has_many :comments, dependent: :destroy
+    has_many :tournament_entries, dependent: :destroy
+    has_many :race_results, through: :tournament_entries
+    has_many :monthly_goals, dependent: :destroy
+
     enum :role, { member: 0, leader: 1 }
 
     # JWTトークン用にユーザー情報をペイロードに変換

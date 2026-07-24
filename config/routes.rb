@@ -7,6 +7,20 @@ Rails.application.routes.draw do
       end
 
       get "me", to: "users#me"
+
+      resources :practice_records, only: [:index, :create, :show, :update, :destroy] do
+        resources :comments, only: [:index, :create]
+      end
+      resources :comments, only: [:destroy]
+      resources :tournaments, only: [:index, :create, :show, :update, :destroy] do
+        resources :tournament_entries, only: [:index, :create]
+      end
+      resources :tournament_entries, only: [:update, :destroy] do 
+        resources :race_results, only: [:index, :create]
+      end
+
+      resources :race_results, only: [:update, :destroy]
+      resources :monthly_goals, only: [:index, :create, :update, :destroy]
     end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
