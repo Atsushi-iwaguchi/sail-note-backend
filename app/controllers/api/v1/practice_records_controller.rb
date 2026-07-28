@@ -1,11 +1,17 @@
 class Api::V1::PracticeRecordsController < ApplicationController
     before_action :authenticate_user!
-    before_action :set_record, only: [:update, :destroy]
+    before_action :set_record, only: [ :update, :destroy ]
 
     def index
-        #記事を新しい順にする
+        # 記事を新しい順にする
         records = PracticeRecord.order(created_at: :desc)
-        render json: records
+        render json: records.as_json(
+            include: {
+                user: {
+                    only: [ :id, :username ]
+                }
+            }
+        )
     end
 
     def create
@@ -20,7 +26,13 @@ class Api::V1::PracticeRecordsController < ApplicationController
 
     def show
         record = PracticeRecord.find(params[:id])
-        render json: record
+        render json: record.as_json(
+            include: {
+                user: {
+                    only: [ :id, :username ]
+                }
+            }
+        )
     end
 
     def destroy

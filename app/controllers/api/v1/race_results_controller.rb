@@ -1,7 +1,7 @@
 class Api::V1::RaceResultsController < ApplicationController
     before_action :authenticate_user!
-    before_action :set_tournament_entry, only: [:index, :create]
-    before_action :set_result, only: [:update, :destroy]
+    before_action :set_tournament_entry, only: [ :index, :create ]
+    before_action :set_result, only: [ :update, :destroy ]
 
 
     def index
@@ -11,7 +11,7 @@ class Api::V1::RaceResultsController < ApplicationController
 
     def create
         result = @tournament_entry.race_results.build(result_params)
-        
+
         if result.save
             render json: result, status: :created
         else

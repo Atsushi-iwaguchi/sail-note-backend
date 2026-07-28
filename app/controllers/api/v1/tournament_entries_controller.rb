@@ -1,7 +1,7 @@
 class Api::V1::TournamentEntriesController < ApplicationController
     before_action :authenticate_user!
-    before_action :set_tournament, only: [:index, :create]
-    before_action :set_entry, only: [:destroy, :update]
+    before_action :set_tournament, only: [ :index, :create ]
+    before_action :set_entry, only: [ :destroy, :update ]
 
     def index
         entries = @tournament.tournament_entries
@@ -10,7 +10,7 @@ class Api::V1::TournamentEntriesController < ApplicationController
 
     def create
         entry = current_user.tournament_entries.new(
-            #belongs_to :tournament の関連付けを利用
+            # belongs_to :tournament の関連付けを利用
             tournament: @tournament,
             overall_ranking: entry_params[:overall_ranking],
             reflection: entry_params[:reflection]

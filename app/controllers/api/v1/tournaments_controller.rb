@@ -1,6 +1,6 @@
 class Api::V1::TournamentsController < ApplicationController
     before_action :authenticate_user!
-    before_action :set_tournament, only:[:show, :destroy, :update]
+    before_action :set_tournament, only: [ :show, :destroy, :update ]
 
     def index
         tournaments = Tournament.order(created_at: :desc)

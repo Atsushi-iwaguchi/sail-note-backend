@@ -1,6 +1,6 @@
 class Api::V1::CommentsController < ApplicationController
     before_action :authenticate_user!
-    before_action :set_practice_record, only: [:index, :create]
+    before_action :set_practice_record, only: [ :index, :create ]
 
     def index
         comments = @practice_record.comments
@@ -13,7 +13,7 @@ class Api::V1::CommentsController < ApplicationController
             practice_record: @practice_record,
             content: comment_params[:content]
             )
-        
+
         if comment.save
             render json: comment, status: :created
         else
@@ -35,5 +35,4 @@ class Api::V1::CommentsController < ApplicationController
     def set_practice_record
         @practice_record = PracticeRecord.find(params[:practice_record_id])
     end
-
 end
