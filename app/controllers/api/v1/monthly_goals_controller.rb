@@ -1,10 +1,14 @@
 class Api::V1::MonthlyGoalsController < ApplicationController
     before_action :authenticate_user!
-    before_action :set_goal, only: [ :update, :destroy ]
+    before_action :set_goal, only: [ :show, :update, :destroy ]
 
     def index
         goals = current_user.monthly_goals.order(goal_date: :desc)
         render json: goals
+    end
+
+    def show
+        render json: @goal
     end
 
     def create
