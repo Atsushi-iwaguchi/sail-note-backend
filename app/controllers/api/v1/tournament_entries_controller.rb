@@ -4,8 +4,8 @@ class Api::V1::TournamentEntriesController < ApplicationController
     before_action :set_entry, only: [ :destroy, :update ]
 
     def index
-        entries = @tournament.tournament_entries
-        render json: entries
+        entries = @tournament.tournament_entries.includes(:race_results)
+        render json: entries.as_json(include: :race_results)
     end
 
     def create
