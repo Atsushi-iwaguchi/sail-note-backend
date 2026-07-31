@@ -13,7 +13,7 @@ Rails.application.routes.draw do
       end
       resources :comments, only: [ :destroy ]
       resources :tournaments, only: [ :index, :create, :show, :update, :destroy ] do
-        resources :tournament_entries, only: [ :index, :create ]
+        resources :tournament_entries, only: [ :index, :create, :show ]
       end
       resources :tournament_entries, only: [ :update, :destroy ] do
         resources :race_results, only: [ :index, :create ]

@@ -8,6 +8,12 @@ class Api::V1::TournamentEntriesController < ApplicationController
         render json: entries.as_json(include: :race_results)
     end
 
+    def show
+        entry = TournamentEntry.includes(:race_results).find(params[:id])
+
+        render json: entry.as_json(include: :race_results)
+    end
+
     def create
         entry = current_user.tournament_entries.new(
             # belongs_to :tournament の関連付けを利用
