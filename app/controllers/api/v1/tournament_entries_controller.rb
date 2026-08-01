@@ -9,9 +9,9 @@ class Api::V1::TournamentEntriesController < ApplicationController
     end
 
     def show
-        entry = TournamentEntry.includes(:race_results).find(params[:id])
+        entry = TournamentEntry.includes(:race_results, :user).find(params[:id])
 
-        render json: entry.as_json(include: :race_results)
+        render json: entry.as_json(include: [:race_results, user: { only: [:id, :username] }])
     end
 
     def create
