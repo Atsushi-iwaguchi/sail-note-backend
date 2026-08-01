@@ -10,13 +10,16 @@ class Api::V1::RaceResultsController < ApplicationController
     end
 
     def create
-        result = @tournament_entry.race_results.build(result_params)
+        results = params.require(:race_results)
 
-        if result.save
-            render json: result, status: :created
-        else
-            render json: { errors: result.errors.full_messages }, status: :unprocessable_entity
+        results.each do |result|
+            @tournament_entry.race_results.create!(
+            race_number: result[:race_number],
+            score: result[:score]
+            )
         end
+
+        render json: { message: "作成しました" }, status: :created
     end
 
     def update
@@ -35,7 +38,11 @@ class Api::V1::RaceResultsController < ApplicationController
     private
 
     def result_params
-        params.require(:race_result).permit(:race_number, :score)
+        params.require(:race_results).map do |result|
+            ActionController::Parameters
+            .new(result)
+            .permit(:race_number, :score)
+        end
     end
 
     def set_tournament_entry
