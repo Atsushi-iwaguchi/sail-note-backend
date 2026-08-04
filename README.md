@@ -1,24 +1,16 @@
-# README
+# Sail Note backend
+ヨット部向け練習記録管理アプリ「Sail Note」のバックエンドリポジトリである。
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+#概要
+ヨット部の練習記録・大会成績・月間目標を一元管理し、部員間で情報を共有できるWebアプリケーションである。
 
-Things you may want to cover:
+現役ヨット部員時代、練習内容や船のセッティング、反省点が各自バラバラに管理されており、過去の記録を振り返りにくいという理由から開発した。
 
-* Ruby version
+#主な技術
 
-* System dependencies
+#バックエンド
+- Ruby on Rails
 
-* Configuration
+#インフラ
 
-* Database creation
 
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
