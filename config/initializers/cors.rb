@@ -9,6 +9,7 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
     origins "http://localhost:5173",
            "https://sail-note-frontend.vercel.app"
+           "https://sailnote-app.com"
 
     resource "/api/*",
       headers: :any,
