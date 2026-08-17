@@ -2,7 +2,7 @@ require "test_helper"
 
 class Api::V1::SessionsControllerTest < ActionDispatch::IntegrationTest
   test "should login" do
-    #テストユーザーの作成
+    # テストユーザーの作成
     User.create!(
       username: "testuser",
       email: "test@example.com",
