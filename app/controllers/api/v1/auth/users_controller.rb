@@ -5,7 +5,7 @@ class Api::V1::Auth::UsersController < ApplicationController
     if @user.save
       token = generate_token(@user)
       render json: {
-        user: { id: @user.username, email: @user.email },
+        user: { username: @user.username, email: @user.email },
         token: token
       }, status: :created
     else
