@@ -5,13 +5,13 @@ class Api::V1::TournamentEntriesController < ApplicationController
 
     def index
         entries = @tournament.tournament_entries.includes(:user, :race_results)
-        render json: entries.as_json(include: [:race_results, user: { only: [:id, :username] }])
+        render json: entries.as_json(include: [ :race_results, user: { only: [ :id, :username ] } ])
     end
 
     def show
         entry = TournamentEntry.includes(:race_results, :user).find(params[:id])
 
-        render json: entry.as_json(include: [:race_results, user: { only: [:id, :username] }])
+        render json: entry.as_json(include: [ :race_results, user: { only: [ :id, :username ] } ])
     end
 
     def create
