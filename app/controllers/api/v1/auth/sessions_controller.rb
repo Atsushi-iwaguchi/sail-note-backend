@@ -7,7 +7,7 @@ class Api::V1::Auth::SessionsController < ApplicationController
     if user && user.authenticate(params[:password])
       token = generate_token(user)
       render json: {
-        user: { username: user.username, email: user.email },
+        user: { user_id: user.id, username: user.username, email: user.email },
         token: token
       }
     else

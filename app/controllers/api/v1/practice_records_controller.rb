@@ -3,7 +3,13 @@ class Api::V1::PracticeRecordsController < ApplicationController
     before_action :set_record, only: [ :update, :destroy ]
 
     def index
-        records = PracticeRecord.order(created_at: :desc)
+        records = PracticeRecord
+                    .from_date(params[:from_date])
+                    .to_date(params[:to_date])
+                    .by_wind_direction(params[:wind_direction])
+                    .min_wind(params[:min_wind_speed])
+                    .max_wind(params[:max_wind_speed])
+                    .order(created_at: :desc) .
         render json: records.map { |record| record_json(record) }
     end
 
