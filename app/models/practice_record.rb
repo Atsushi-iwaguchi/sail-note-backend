@@ -6,11 +6,11 @@ class PracticeRecord < ApplicationRecord
 
     validates :practice_date, presence: true
 
-    scope :from_date, ->(date) { where("practice_date >=? date") if date.present? }
-    scope :to_date, ->(date) { where("practice_date <=? date") if date.present? }
-    scope :wind_direction, ->(direction) { where(wind_direction: direction) if direction.present? }
-    scope :max_wind, ->(speed) { where("max_wind_speed <= speed") if speed.present? }
-    scope :min_wind, ->(speed) { where("min_wind_speed >= speed") if speed.present? }
+    scope :from_date, ->(date) { date.present? ? where("practice_date >= ?", date) : all }
+    scope :to_date, ->(date) { date.present? ? where("practice_date <= ?", date) : all }
+    scope :wind_direction, ->(direction) { direction.present? ? where(wind_direction: direction) : all }
+    scope :min_wind, ->(speed) { speed.present? ? where("max_wind_speed >= ?", speed) : all }
+    scope :max_wind, ->(speed) { speed.present? ? where("min_wind_speed <= ?", speed) : all }
 
     enum :tide, {
         oshio: 0,
