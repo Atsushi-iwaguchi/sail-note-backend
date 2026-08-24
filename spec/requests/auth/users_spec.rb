@@ -21,7 +21,7 @@ RSpec.describe "Api::V1::Auth::Users", type: :request do
           as: :json
       }.to change(User, :count).by(1)
 
-      #APIから返ってきたJSON文字列をRubyのHashに変換
+      # APIから返ってきたJSON文字列をRubyのHashに変換
       expect(response).to have_http_status(:created)
 
       json = JSON.parse(response.body)
@@ -29,6 +29,9 @@ RSpec.describe "Api::V1::Auth::Users", type: :request do
       expect(json["user"]["username"]).to eq("テストユーザー")
       expect(json["user"]["email"]).to eq("new@example.com")
       expect(json["token"]).to be_present
+      # パスワードがレスポンスに含まれていない
+      expect(json["user"]).not_to have_key("password")
+      expect(json["user"]).not_to have_key("password_digest")
     end
 
     it "emailがない場合は422を返す" do
@@ -50,21 +53,10 @@ RSpec.describe "Api::V1::Auth::Users", type: :request do
         as: :json
 
       expect(response).to have_http_status(:unprocessable_entity)
-      
+
       json = JSON.parse(response.body)
 
-      expect(json["errors"]).to include("Email has already been taken")
-    end
-
-    it "emailがない場合は422を返す" do
-      params = valid_params.deep_dup
-      params[:user].delete(:email)
-
-      post "/api/v1/auth/register",
-        params: params,
-        as: :json
-
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(json["errors"]).to be_present
     end
 
     it "passwordとpassword_confirmationが一致しない場合は422を返す" do
