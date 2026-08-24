@@ -15,8 +15,14 @@ RSpec.describe User, type: :model do
       expect(user).not_to be_valid
     end
 
-    it "emailのフォーマット" do
+    it "emailのフォーマットになっていないと無効になる" do
       user = build(:user, email: "asdf1231321")
+
+      expect(user).not_to be_valid
+    end
+
+    it "パスワードが5文字以内なら無効になる" do
+      user = build(:user, password: "asdf1")
 
       expect(user).not_to be_valid
     end
