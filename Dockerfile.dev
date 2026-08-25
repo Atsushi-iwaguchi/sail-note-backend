@@ -1,11 +1,12 @@
 FROM ruby:3.4.9
 
-# gem pgのインストールでエラーを出さないように
+# gem pg、ruby-vipsのインストールに必要なパッケージ
 RUN apt-get update && \
     apt-get install -y \
       build-essential \
       libpq-dev \
-      postgresql-client && \
+      postgresql-client \
+      libvips && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
