@@ -1,6 +1,15 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::PracticeRecords", type: :request do
+  it "JWTが不正の場合401を返す" do
+    get "/api/v1/practice_records",
+      headers: {
+        "Authorization" => "Bearer invalid_token"
+      }
+
+      expect(response).to have_http_status(:unauthorized)
+  end
+
   describe "GET /api/v1/practice_records" do
     let!(:user) { create(:user) }
 
@@ -92,15 +101,19 @@ RSpec.describe "Api::V1::PracticeRecords", type: :request do
       expect(json.length).to eq(1)
       expect(json[0]["id"]).to eq(target_record.id)
     end
-  end
 
-  it "JWTが不正の場合401を返す" do
-    get "/api/v1/practice_records",
-      headers: {
-        "Authorization" => "Bearer invalid_token"
-      }
+    it "指定した練習記録を取得" do
+      practice_record = create(:practice_record, user: user)
 
-      expect(response).to have_http_status(:unauthorized)
+      get "/api/v1/practice_records/#{practice_record.id}",
+        headers: headers
+
+      expect(response).to have_http_status(:ok)
+
+      json = JSON.parse(response.body)
+
+      expect(json["id"]).to eq(practice_record.id)
+    end
   end
 
   describe "POST /api/v1/practice_records" do
@@ -166,6 +179,98 @@ RSpec.describe "Api::V1::PracticeRecords", type: :request do
         }.not_to change(PracticeRecord, :count)
 
         expect(response).to have_http_status(:unprocessable_content)
+    end
+  end
+
+  describe "PATCH /api/v1/practice_records/:id" do
+    let!(:user) { create(:user) }
+
+    let(:token) do
+      JWT.encode(
+        user.to_token_payload,
+        Rails.application.secret_key_base,
+        "HS256"
+      )
+    end
+
+    let(:headers) do
+      {
+        "Authorization" => "Bearer #{token}"
+      }
+    end
+
+    it "自身の練習記録を編集できる" do
+      practice_record = create(:practice_record, user: user)
+
+      patch "/api/v1/practice_records/#{practice_record.id}",
+        params: {
+                practice_record: {
+                min_wind_speed: 2
+                }
+            },
+        headers: headers
+
+      json = JSON.parse(response.body)
+      expect(json["min_wind_speed"]).to eq(2)
+      expect(practice_record.reload.min_wind_speed).to eq(2)
+    end
+
+    it "他ユーザーの練習記録は編集できない" do
+      dummy_user = create(:user, email: "dummy@example.com")
+
+      practice_record = create(:practice_record, user: dummy_user)
+
+      patch "/api/v1/practice_records/#{practice_record.id}",
+        params: {
+                practice_record: {
+                min_wind_speed: 2
+                }
+            },
+        headers: headers
+
+      expect(response).to have_http_status(:not_found)
+      expect(practice_record.reload.min_wind_speed).not_to eq(2)
+    end
+  end
+
+  describe "DELETE /api/v1/practice_records/:id" do
+    let!(:user) { create(:user) }
+
+    let(:token) do
+      JWT.encode(
+        user.to_token_payload,
+        Rails.application.secret_key_base,
+        "HS256"
+      )
+    end
+
+    let(:headers) do
+      {
+        "Authorization" => "Bearer #{token}"
+      }
+    end
+
+    it "自身の練習記録を削除できる" do
+      practice_record = create(:practice_record, user: user)
+
+      expect {
+        delete "/api/v1/practice_records/#{practice_record.id}",
+        headers: headers
+      }.to change(PracticeRecord, :count).by(-1)
+
+      expect(response).to have_http_status(:ok)
+      expect(PracticeRecord.exists?(practice_record.id)).to be false
+    end
+
+    it "他ユーザーでは削除できない" do
+      dummy_user = create(:user, email: "dummy@example.com")
+      practice_record = create(:practice_record, user: dummy_user)
+
+        delete "/api/v1/practice_records/#{practice_record.id}",
+          headers: headers
+
+      expect(response).to have_http_status(:not_found)
+      expect(PracticeRecord.exists?(practice_record.id)).to be true
     end
   end
 end
