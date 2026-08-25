@@ -1,6 +1,13 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::PracticeRecords", type: :request do
+  let!(:user) { create(:user) }
+  let!(:other_user) { create(:user, email: "other@example.com") }
+  let(:token) do
+    JWT.encode(user.to_token_payload, Rails.application.secret_key_base, "HS256")
+  end
+  let(:headers) { { "Authorization" => "Bearer #{token}" } }
+
   it "JWTが不正の場合401を返す" do
     get "/api/v1/practice_records",
       headers: {
@@ -11,22 +18,6 @@ RSpec.describe "Api::V1::PracticeRecords", type: :request do
   end
 
   describe "GET /api/v1/practice_records" do
-    let!(:user) { create(:user) }
-
-    let(:token) do
-      JWT.encode(
-        user.to_token_payload,
-        Rails.application.secret_key_base,
-        "HS256"
-      )
-    end
-
-    let(:headers) do
-      {
-        "Authorization" => "Bearer #{token}"
-      }
-    end
-
     it "認証していない場合401を返す" do
       get "/api/v1/practice_records"
 
@@ -117,22 +108,6 @@ RSpec.describe "Api::V1::PracticeRecords", type: :request do
   end
 
   describe "POST /api/v1/practice_records" do
-    let!(:user) { create(:user) }
-
-    let(:token) do
-      JWT.encode(
-        user.to_token_payload,
-        Rails.application.secret_key_base,
-        "HS256"
-      )
-    end
-
-    let(:headers) do
-      {
-        "Authorization" => "Bearer #{token}"
-      }
-    end
-
     it "認証済みユーザーが練習記録を作成できる" do
       expect {
         post "/api/v1/practice_records",
@@ -146,7 +121,8 @@ RSpec.describe "Api::V1::PracticeRecords", type: :request do
               content: "今日は風が強かった"
             }
           },
-          headers: headers
+          headers: headers,
+          as: :json
       }.to change(PracticeRecord, :count).by(1)
 
       expect(response).to have_http_status(:created)
@@ -175,7 +151,8 @@ RSpec.describe "Api::V1::PracticeRecords", type: :request do
                 content: "今日は風が強かった"
             }
             },
-            headers: headers
+            headers: headers,
+            as: :json
         }.not_to change(PracticeRecord, :count)
 
         expect(response).to have_http_status(:unprocessable_content)
@@ -183,22 +160,6 @@ RSpec.describe "Api::V1::PracticeRecords", type: :request do
   end
 
   describe "PATCH /api/v1/practice_records/:id" do
-    let!(:user) { create(:user) }
-
-    let(:token) do
-      JWT.encode(
-        user.to_token_payload,
-        Rails.application.secret_key_base,
-        "HS256"
-      )
-    end
-
-    let(:headers) do
-      {
-        "Authorization" => "Bearer #{token}"
-      }
-    end
-
     it "自身の練習記録を編集できる" do
       practice_record = create(:practice_record, user: user)
 
@@ -208,7 +169,10 @@ RSpec.describe "Api::V1::PracticeRecords", type: :request do
                 min_wind_speed: 2
                 }
             },
-        headers: headers
+        headers: headers,
+        as: :json
+
+      expect(response).to have_http_status(:ok)
 
       json = JSON.parse(response.body)
       expect(json["min_wind_speed"]).to eq(2)
@@ -216,9 +180,7 @@ RSpec.describe "Api::V1::PracticeRecords", type: :request do
     end
 
     it "他ユーザーの練習記録は編集できない" do
-      dummy_user = create(:user, email: "dummy@example.com")
-
-      practice_record = create(:practice_record, user: dummy_user)
+      practice_record = create(:practice_record, user: other_user)
 
       patch "/api/v1/practice_records/#{practice_record.id}",
         params: {
@@ -226,7 +188,8 @@ RSpec.describe "Api::V1::PracticeRecords", type: :request do
                 min_wind_speed: 2
                 }
             },
-        headers: headers
+        headers: headers,
+        as: :json
 
       expect(response).to have_http_status(:not_found)
       expect(practice_record.reload.min_wind_speed).not_to eq(2)
@@ -234,28 +197,13 @@ RSpec.describe "Api::V1::PracticeRecords", type: :request do
   end
 
   describe "DELETE /api/v1/practice_records/:id" do
-    let!(:user) { create(:user) }
-
-    let(:token) do
-      JWT.encode(
-        user.to_token_payload,
-        Rails.application.secret_key_base,
-        "HS256"
-      )
-    end
-
-    let(:headers) do
-      {
-        "Authorization" => "Bearer #{token}"
-      }
-    end
-
     it "自身の練習記録を削除できる" do
       practice_record = create(:practice_record, user: user)
 
       expect {
         delete "/api/v1/practice_records/#{practice_record.id}",
-        headers: headers
+        headers: headers,
+        as: :json
       }.to change(PracticeRecord, :count).by(-1)
 
       expect(response).to have_http_status(:ok)
@@ -263,11 +211,11 @@ RSpec.describe "Api::V1::PracticeRecords", type: :request do
     end
 
     it "他ユーザーでは削除できない" do
-      dummy_user = create(:user, email: "dummy@example.com")
-      practice_record = create(:practice_record, user: dummy_user)
+      practice_record = create(:practice_record, user: other_user)
 
         delete "/api/v1/practice_records/#{practice_record.id}",
-          headers: headers
+          headers: headers,
+          as: :json
 
       expect(response).to have_http_status(:not_found)
       expect(PracticeRecord.exists?(practice_record.id)).to be true

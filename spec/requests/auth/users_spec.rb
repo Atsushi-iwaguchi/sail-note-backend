@@ -42,7 +42,7 @@ RSpec.describe "Api::V1::Auth::Users", type: :request do
         params: params,
         as: :json
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it "emailが重複している場合は422を返す" do
@@ -52,7 +52,7 @@ RSpec.describe "Api::V1::Auth::Users", type: :request do
         params: valid_params,
         as: :json
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
 
       json = JSON.parse(response.body)
 
@@ -67,7 +67,7 @@ RSpec.describe "Api::V1::Auth::Users", type: :request do
         params: params,
         as: :json
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 end
