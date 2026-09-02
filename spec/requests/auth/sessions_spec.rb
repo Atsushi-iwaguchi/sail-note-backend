@@ -18,7 +18,7 @@ RSpec.describe "Api::V1::Auth::Sessions", type: :request do
 
       json = JSON.parse(response.body)
 
-      expect(json["user"]["user_id"]).to eq(user.id)
+      expect(json["user"]["id"]).to eq(user.id)
       expect(json["user"]["username"]).to eq(user.username)
       expect(json["user"]["email"]).to eq(user.email)
       expect(json["token"]).to be_present
