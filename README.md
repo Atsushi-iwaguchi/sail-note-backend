@@ -45,7 +45,7 @@
 | インフラ | AWS（EC2 / RDS / S3 ） |
 | 環境構築 | Docker |
 | CI/CD | GitHub Actions（RuboCop / Brakeman / bundler-audit / テスト自動実行） |
-| テスト | RSpec |
+| テスト | RSpec / RuboCop |
 
 ## 設計資料
 
